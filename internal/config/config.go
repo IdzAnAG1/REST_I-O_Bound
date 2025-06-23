@@ -2,56 +2,61 @@ package config
 
 import (
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 	"rest_io_bound/internal/variables"
 )
 
 type Config struct {
-	// http configurations
-	HTTPServerConfig struct {
-		Port string
-	}
+	HTTP HTTP `mapstructure:"http"`
+}
+type HTTP struct {
+	Port string `mapstructure:"port"`
 }
 
 func LoadConfig() (*Config, error) {
-	if !isConfigDirectoryExists(variables.CONFIG_DIRECTORY) {
-		if err := createConfigDirectory(
-			variables.CONFIG_DIRECTORY); err != nil {
+	dirPath, err := pathToConfigDir()
+	if err != nil {
+		return nil, err
+	}
+	filePath := pathToConfigFile(dirPath)
+	if !IsConfigDirectoryExists(dirPath) {
+		if err := createConfigDirectory(dirPath); err != nil {
 			return nil, err
 		}
-		if err := createConfigFile(
-			variables.CONFIG_DIRECTORY, variables.CONFIG_FILE_NAME+variables.CONFIG_FILE_TYPE); err != nil {
+		if err := createConfigFile(filePath); err != nil {
 			return nil, err
 		}
 	}
-	cfg, err := readConfig(variables.CONFIG_DIRECTORY)
+	cfg, err := readConfig(dirPath)
+
 	if err != nil {
 		return nil, err
 	}
 	return cfg, nil
 }
-func createConfigDirectory(path string) error {
-	err := os.Mkdir(path, 0755)
-	if err != nil {
-		return err
-	}
-	return nil
+
+func createConfigDirectory(pathToDir string) error {
+	return os.Mkdir(pathToDir, os.ModePerm)
 }
-func createConfigFile(path, filename string) error {
-	fullPath := filepath.Join(path, filename)
-	file, err := os.Create(fullPath)
+
+func createConfigFile(pathToFile string) error {
+	cfg := Config{
+		HTTP: HTTP{
+			Port: variables.DEFAULT_HTTP_PORT,
+		},
+	}
+
+	data, err := yaml.Marshal(&cfg)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
-	err = os.WriteFile(fullPath, []byte(variables.DEFAULT_VALUE_FOR_CONFIG), os.ModePerm)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return os.WriteFile(pathToFile, data, os.ModePerm)
 }
-func isConfigDirectoryExists(path string) bool {
+
+func IsConfigDirectoryExists(path string) bool {
 	fileInfo, err := os.Stat(path)
 	if os.IsNotExist(err) {
 		return false
@@ -73,4 +78,16 @@ func readConfig(path string) (*Config, error) {
 		return nil, err
 	}
 	return cfg, nil
+}
+
+func pathToConfigDir() (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(homeDir, variables.CONFIG_DIRECTORY), nil
+}
+
+func pathToConfigFile(pathToDir string) string {
+	return filepath.Join(pathToDir, variables.CONFIG_FILE_NAME+"."+variables.CONFIG_FILE_TYPE)
 }
