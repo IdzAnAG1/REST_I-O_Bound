@@ -18,6 +18,8 @@ func (ws *WebServer) Launch() {
 
 	router.Handle("GET", "/", handlers.GetTasks)
 	router.Handle("POST", "/", handlers.CreateTask)
+	router.Handle("GET", "/:id", handlers.GetTaskById)
+	router.Handle("DELETE", "/:id", handlers.DeleteTaskByID)
 
 	err := router.Run(":" + ws.port)
 	if err != nil {

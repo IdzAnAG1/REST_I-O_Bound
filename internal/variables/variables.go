@@ -1,5 +1,10 @@
 package variables
 
+import (
+	"rest_io_bound/internal/models"
+	"time"
+)
+
 const (
 	HTTP_PORT_KEY     = "HTTP_PORT"
 	MSG               = "Not successful"
@@ -8,3 +13,11 @@ const (
 	CONFIG_FILE_TYPE  = "yaml"
 	DEFAULT_HTTP_PORT = "8080"
 )
+
+var Storage = map[string]*models.Task{
+	"1": {
+		Title:   "1",
+		Status:  "Always In Progress",
+		Created: time.Now(),
+	},
+}
