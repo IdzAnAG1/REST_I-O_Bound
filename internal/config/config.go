@@ -38,7 +38,7 @@ func LoadConfig() (*Config, error) {
 }
 
 func createConfigDirectory(pathToDir string) error {
-	return os.Mkdir(pathToDir, os.ModePerm)
+	return os.MkdirAll(pathToDir, os.ModePerm)
 }
 
 func createConfigFile(pathToFile string) error {
