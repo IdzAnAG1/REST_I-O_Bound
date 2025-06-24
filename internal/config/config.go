@@ -66,8 +66,8 @@ func IsConfigDirectoryExists(path string) bool {
 
 func readConfig(path string) (*Config, error) {
 	cfg := &Config{}
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
+	viper.SetConfigName(variables.CONFIG_FILE_NAME)
+	viper.SetConfigType(variables.CONFIG_FILE_TYPE)
 	viper.AddConfigPath(path)
 
 	if err := viper.ReadInConfig(); err != nil {

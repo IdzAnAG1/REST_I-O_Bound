@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"rest_io_bound/internal/config"
+	"rest_io_bound/internal/server"
 )
 
 func main() {
@@ -12,4 +13,8 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(cfg)
+
+	Server := server.NewWebServer(cfg.HTTP.Port)
+
+	Server.Launch()
 }
