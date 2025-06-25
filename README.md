@@ -28,6 +28,9 @@
   "title": " Name of Task "
 }
 ```
+---
+## Updating
+- I mark new updates in the branch "updating"
 ___
 
 ### Project structure
